@@ -1,0 +1,6 @@
+saved_bb_features/
+saved_clip_features/
+saved_clip_similarities/
+venv/
+*CBM.code-workspace
+__pycache__/
