@@ -1,0 +1,312 @@
+bill shape is curved (up or down)
+bill shape is dagger
+bill shape is hooked
+bill shape is needle
+bill shape is hooked seabird
+bill shape is spatulate
+bill shape is all-purpose
+bill shape is cone
+bill shape is specialized
+wing color is blue
+wing color is brown
+wing color is iridescent
+wing color is purple
+wing color is rufous
+wing color is grey
+wing color is yellow
+wing color is olive
+wing color is green
+wing color is pink
+wing color is orange
+wing color is black
+wing color is white
+wing color is red
+wing color is buff
+upperparts color is blue
+upperparts color is brown
+upperparts color is iridescent
+upperparts color is purple
+upperparts color is rufous
+upperparts color is grey
+upperparts color is yellow
+upperparts color is olive
+upperparts color is green
+upperparts color is pink
+upperparts color is orange
+upperparts color is black
+upperparts color is white
+upperparts color is red
+upperparts color is buff
+underparts color is blue
+underparts color is brown
+underparts color is iridescent
+underparts color is purple
+underparts color is rufous
+underparts color is grey
+underparts color is yellow
+underparts color is olive
+underparts color is green
+underparts color is pink
+underparts color is orange
+underparts color is black
+underparts color is white
+underparts color is red
+underparts color is buff
+breast pattern is solid
+breast pattern is spotted
+breast pattern is striped
+breast pattern is multi-colored
+back color is blue
+back color is brown
+back color is iridescent
+back color is purple
+back color is rufous
+back color is grey
+back color is yellow
+back color is olive
+back color is green
+back color is pink
+back color is orange
+back color is black
+back color is white
+back color is red
+back color is buff
+tail shape is forked tail
+tail shape is rounded tail
+tail shape is notched tail
+tail shape is fan-shaped tail
+tail shape is pointed tail
+tail shape is squared tail
+upper tail color is blue
+upper tail color is brown
+upper tail color is iridescent
+upper tail color is purple
+upper tail color is rufous
+upper tail color is grey
+upper tail color is yellow
+upper tail color is olive
+upper tail color is green
+upper tail color is pink
+upper tail color is orange
+upper tail color is black
+upper tail color is white
+upper tail color is red
+upper tail color is buff
+head pattern is spotted
+head pattern is malar
+head pattern is crested
+head pattern is masked
+head pattern is unique pattern
+head pattern is eyebrow
+head pattern is eyering
+head pattern is plain
+head pattern is eyeline
+head pattern is striped
+head pattern is capped
+breast color is blue
+breast color is brown
+breast color is iridescent
+breast color is purple
+breast color is rufous
+breast color is grey
+breast color is yellow
+breast color is olive
+breast color is green
+breast color is pink
+breast color is orange
+breast color is black
+breast color is white
+breast color is red
+breast color is buff
+throat color is blue
+throat color is brown
+throat color is iridescent
+throat color is purple
+throat color is rufous
+throat color is grey
+throat color is yellow
+throat color is olive
+throat color is green
+throat color is pink
+throat color is orange
+throat color is black
+throat color is white
+throat color is red
+throat color is buff
+eye color is blue
+eye color is brown
+eye color is purple
+eye color is rufous
+eye color is grey
+eye color is yellow
+eye color is olive
+eye color is green
+eye color is pink
+eye color is orange
+eye color is black
+eye color is white
+eye color is red
+eye color is buff
+bill length is about the same as head
+bill length is longer than head
+bill length is shorter than head
+forehead color is blue
+forehead color is brown
+forehead color is iridescent
+forehead color is purple
+forehead color is rufous
+forehead color is grey
+forehead color is yellow
+forehead color is olive
+forehead color is green
+forehead color is pink
+forehead color is orange
+forehead color is black
+forehead color is white
+forehead color is red
+forehead color is buff
+under tail color is blue
+under tail color is brown
+under tail color is iridescent
+under tail color is purple
+under tail color is rufous
+under tail color is grey
+under tail color is yellow
+under tail color is olive
+under tail color is green
+under tail color is pink
+under tail color is orange
+under tail color is black
+under tail color is white
+under tail color is red
+under tail color is buff
+nape color is blue
+nape color is brown
+nape color is iridescent
+nape color is purple
+nape color is rufous
+nape color is grey
+nape color is yellow
+nape color is olive
+nape color is green
+nape color is pink
+nape color is orange
+nape color is black
+nape color is white
+nape color is red
+nape color is buff
+belly color is blue
+belly color is brown
+belly color is iridescent
+belly color is purple
+belly color is rufous
+belly color is grey
+belly color is yellow
+belly color is olive
+belly color is green
+belly color is pink
+belly color is orange
+belly color is black
+belly color is white
+belly color is red
+belly color is buff
+wing shape is rounded-wings
+wing shape is pointed-wings
+wing shape is broad-wings
+wing shape is tapered-wings
+wing shape is long-wings
+size is large (16 - 32 in)
+size is small (5 - 9 in)
+size is very large (32 - 72 in)
+size is medium (9 - 16 in)
+size is very small (3 - 5 in)
+shape is upright-perching water-like
+shape is chicken-like-marsh
+shape is long-legged-like
+shape is duck-like
+shape is owl-like
+shape is gull-like
+shape is hummingbird-like
+shape is pigeon-like
+shape is tree-clinging-like
+shape is hawk-like
+shape is sandpiper-like
+shape is upland-ground-like
+shape is swallow-like
+shape is perching-like
+back pattern is solid
+back pattern is spotted
+back pattern is striped
+back pattern is multi-colored
+tail pattern is solid
+tail pattern is spotted
+tail pattern is striped
+tail pattern is multi-colored
+belly pattern is solid
+belly pattern is spotted
+belly pattern is striped
+belly pattern is multi-colored
+primary color is blue
+primary color is brown
+primary color is iridescent
+primary color is purple
+primary color is rufous
+primary color is grey
+primary color is yellow
+primary color is olive
+primary color is green
+primary color is pink
+primary color is orange
+primary color is black
+primary color is white
+primary color is red
+primary color is buff
+leg color is blue
+leg color is brown
+leg color is iridescent
+leg color is purple
+leg color is rufous
+leg color is grey
+leg color is yellow
+leg color is olive
+leg color is green
+leg color is pink
+leg color is orange
+leg color is black
+leg color is white
+leg color is red
+leg color is buff
+bill color is blue
+bill color is brown
+bill color is iridescent
+bill color is purple
+bill color is rufous
+bill color is grey
+bill color is yellow
+bill color is olive
+bill color is green
+bill color is pink
+bill color is orange
+bill color is black
+bill color is white
+bill color is red
+bill color is buff
+crown color is blue
+crown color is brown
+crown color is iridescent
+crown color is purple
+crown color is rufous
+crown color is grey
+crown color is yellow
+crown color is olive
+crown color is green
+crown color is pink
+crown color is orange
+crown color is black
+crown color is white
+crown color is red
+crown color is buff
+wing pattern is solid
+wing pattern is spotted
+wing pattern is striped
+wing pattern is multi-colored
