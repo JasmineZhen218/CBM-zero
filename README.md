@@ -5,15 +5,16 @@
 
 ## Dataset notes
 Decide folders to host the data, and save the path to `data_path.py` (not included in this repo). An example is as follows:
-```
-import os
-data_path_cifar10 = os.path.expanduser("~/.cache")
-data_path_cifar100 = os.path.expanduser("~/.cache")
-data_path_imagenet = '/data/imagenet/'
-data_path_food101 = '/data/food101/'
-data_path_cub = '/data/cub/'
-data_path_awa2 = '/data/awa2/'
-```
+
+
+    import os
+    data_path_cifar10 = os.path.expanduser("~/.cache")
+    data_path_cifar100 = os.path.expanduser("~/.cache")
+    data_path_imagenet = '/data/imagenet/'
+    data_path_food101 = '/data/food101/'
+    data_path_cub = '/data/cub/'
+    data_path_awa2 = '/data/awa2/'
+
 * **CIFAR-10** and **CIFAR-100**: the data will be downloaded automatically.
 * **ImageNet**: download the data from https://image-net.org/challenges/LSVRC/2012/2012-downloads.php and place `ILSVRC2012_devkit_t12.tar.gz`, `ILSVRC2012_img_train.tar`, and `ILSVRC2012_img_val.tar` in corresponding folder.
 * **CUB-200-2011**: Download images and concept annotations from https://www.kaggle.com/datasets/wenewone/cub2002011
@@ -42,6 +43,7 @@ Please check the concept names in `/asset/concept_bank`. If you want to use your
     `python evaulate_global.py --data_name <data_name> --concept_set_source <concept_set_source> --black_box_model_name <black_box_model_name>`
 
 * Quantitaively evaulate the local explanation quality (only applicable for CUB-200-2011)
+
     `python evaulate_local.py --data_name <data_name> --concept_set_source <concept_set_source> --black_box_model_name <black_box_model_name>`
 
 The default settings are as follows
