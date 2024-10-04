@@ -38,14 +38,6 @@ Please check the concept names in `/asset/concept_bank`. If you want to use your
 
     `python train.py --data_name <data_name> --concept_set_source <concept_set_source> --black_box_model_name <black_box_model_name>`
 
-* Quantitatively evaluate the global explanation quality with X-factuality (see details in the paper)
-
-    `python evaulate_global.py --data_name <data_name> --concept_set_source <concept_set_source> --black_box_model_name <black_box_model_name>`
-
-* Quantitaively evaulate the local explanation quality (only applicable for CUB-200-2011)
-
-    `python evaulate_local.py --data_name <data_name> --concept_set_source <concept_set_source> --black_box_model_name <black_box_model_name>`
-
 The default settings are as follows
 
 |data_name|concept_set_source|black_box_model_name|
