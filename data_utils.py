@@ -1,6 +1,7 @@
 import os
 from torchvision import datasets, transforms
 from torch.utils import data
+from data_path import data_path_cifar10, data_path_cifar100, data_path_imagenet, data_path_food101, data_path_cub, data_path_awa2
 
 class ActivationDataset(data.Dataset):
     def __init__(self, activations):
@@ -35,77 +36,74 @@ def get_preprocess(dataset_name):
         )
     return preprocess
 
-# note
-# Put the data in the right place
-# For CIFAR-10 and CIFAR-100, the data will be downloaded automatically.
-# For ImageNet, download the data from http://www.image-net.org/ and put it in /data/imagenet and place the train and val folders in it.
+
 
 def get_data(dataset_name, preprocess=None):
     if dataset_name == "cifar10_train":
         data = datasets.CIFAR10(
-            root=os.path.expanduser("~/.cache"),
+            root=data_path_cifar10,
             download=True,
             train=True,
             transform=preprocess,
         )
     elif dataset_name == "cifar10_val":
         data = datasets.CIFAR10(
-            root=os.path.expanduser("~/.cache"),
+            root=data_path_cifar10,
             download=True,
             train=False,
             transform=preprocess,
         )
     elif dataset_name == "cifar100_train":
         data = datasets.CIFAR100(
-            root=os.path.expanduser("~/.cache"),
+            root=data_path_cifar100,
             download=True,
             train=True,
             transform=preprocess,
         )
     elif dataset_name == "cifar100_val":
         data = datasets.CIFAR100(
-            root=os.path.expanduser("~/.cache"),
+            root=data_path_cifar100,
             download=True,
             train=False,
             transform=preprocess,
         )
     elif dataset_name == "imagenet_train":
         data = datasets.ImageNet(
-            root="/data/",
+            root=data_path_imagenet,
             split="train",
             transform=preprocess,
         )
     elif dataset_name == "imagenet_val":
         data = datasets.ImageNet(
-            root="/data/",
+            root=data_path_imagenet,
             split="val",
             transform=preprocess,
         )
     elif dataset_name == "food101_train":
         data = datasets.Food101(
-            root="/data/food101",
+            root=data_path_food101,
             split="train",
             transform=preprocess,
             download=True,
         )
     elif dataset_name == "food101_val":
         data = datasets.Food101(
-            root="/data/food101",
+            root=data_path_food101,
             split="test",
             transform=preprocess,
             download=True,
         )
     elif dataset_name == "cub_train":
-        data = datasets.ImageFolder("data/CUB/train", preprocess)
+        data = datasets.ImageFolder(data_path_cub+"/train", preprocess)
     elif dataset_name == "cub_val":
-        data = datasets.ImageFolder("data/CUB/test", preprocess)
+        data = datasets.ImageFolder(data_path_cub+"/test", preprocess)
     elif dataset_name == "awa2_train":
         data = datasets.ImageFolder(
-            "data/Animals_with_Attributes2/train", preprocess
+            data_path_awa2+"/train", preprocess
         )
     elif dataset_name == "awa2_val":
         data = datasets.ImageFolder(
-            "data/Animals_with_Attributes2/val", preprocess
+            data_path_awa2+"/val", preprocess
         )
     else:
         raise ValueError("Unknown dataset: {}".format(dataset_name))
