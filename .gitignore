@@ -4,3 +4,6 @@ saved_clip_similarities/
 venv/
 *CBM.code-workspace
 __pycache__/
+saved_projections/
+saved_cx/
+saved_bb_last_FCN/
