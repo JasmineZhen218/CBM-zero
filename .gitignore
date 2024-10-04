@@ -7,3 +7,5 @@ __pycache__/
 saved_projections/
 saved_cx/
 saved_bb_last_FCN/
+data_path.py
+data/
