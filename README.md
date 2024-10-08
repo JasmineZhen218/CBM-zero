@@ -27,18 +27,16 @@ Please check `saved_black_box_models/`. These models use a fixed CLIP-ViT-L/14 i
 ## Concept Bank
 The source of concept bank varies per dataset
 
-* CIFAR-10, CIFAR-100, and ImageNet: Concept bank are curated by querying ConceptNet with {class name} and find concepts connected to it.
+* CIFAR-10, CIFAR-100, and ImageNet: Concept bank are curated by querying ConceptNet with {class name} and find concepts connected to it. Check `concept_collection/conceptnet` for codes.
 * CUB and AwA2: Concept bank is the annotations
-* Food-101: Concept bank curated by Labo are used (with filtering of too long concepts).
+* Food-101: Concept bank curated by Labo are used (with filtering of too long concepts). GPT-4 is used to establish valid concepts for each classes. Check `concept_collection/gpt` for codes.
 
 Please check the concept names in `/asset/concept_bank`. If you want to use your own concept bank, please edit `/asset/concept_bank`.
 
 ## Run the code
-* Learn a mapping from the hidden space to concept space to construct cbm with zero performance loss
+### Construct CBM-zero
 
-    `python train.py --data_name <data_name> --concept_set_source <concept_set_source> --black_box_model_name <black_box_model_name>`
-
-The default settings are as follows
+    python train.py --data_name <data_name> --concept_set_source <concept_set_source> --black_box_model_name <black_box_model_name>
 
 |data_name|concept_set_source|black_box_model_name|
 |--|--|--|
@@ -49,7 +47,9 @@ The default settings are as follows
 |awa2|awa2_annotations|clip_mlp_ViT-L_14-h64_cub|
 |food101|food101_labo|clip_mlp_ViT-L_14-h256_food101|
 
-## Tunable hyperparameters
+**Tunable hyperparameters**
 * -- `power` the power of exponential transformation controlling how much you want to emphasize on high clip scores, default = 5
 * -- `lambd` the regularization strength, default = 2.0
 * -- `alpha` the trade-off between L1 and L2 regularization, default = 0.99
+* -- `n_iter` the number of iteration, default = 1000
+* -- `lr` initial learning rate, default = 0.1
