@@ -10,7 +10,7 @@ from clip_utils import (
     get_clip_text_features,
     calculate_clip_similarity,
 )
-from clip_MLP import get_clip_mlp_features, get_clip_mlp_fcn
+from bb_utils import get_clip_mlp_features, get_clip_mlp_fcn, get_clip_lp_fcn
 from cbm_utils import ensure_full_rank, loss_fn
 from evaluation_utils import calculate_x_factuality
 
@@ -53,7 +53,7 @@ parser.add_argument(
     "--clip_model_name", type=str, default="ViT-L_14", help="clip model name"
 )
 parser.add_argument("--seed", type=int, default=42, help="random seed")
-parser.add_argument("--device", type=str, default="cuda:5", help="device to use")
+parser.add_argument("--device", type=str, default="cuda:1", help="device to use")
 parser.add_argument("--lr", type=float, default=0.1, help="learning rate")
 parser.add_argument("--log", action="store_true", help="use concept set list")
 args = parser.parse_args()
@@ -160,7 +160,7 @@ def train_cbm_zero(args):
                 text_features = torch.load(
                     clip_text_embeddings_path,
                     weights_only=True,
-                    map_location=args.device,
+                    map_location='cpu',
                 )
             else:
                 print(
@@ -169,7 +169,7 @@ def train_cbm_zero(args):
                     )
                 )
                 text_features = get_clip_text_features(
-                    args.device, args.clip_model_name, concept_bank
+                    'cpu', args.clip_model_name, concept_bank
                 )
                 torch.save(text_features, clip_text_embeddings_path)
             # image features encoded by clip image encoder
@@ -184,12 +184,12 @@ def train_cbm_zero(args):
                 clip_image_features_train = torch.load(
                     clip_image_embeddings_train_path,
                     weights_only=True,
-                    map_location=args.device,
+                    map_location='cpu',
                 )
                 clip_image_features_val = torch.load(
                     clip_image_embeddings_val_path,
                     weights_only=True,
-                    map_location=args.device,
+                    map_location='cpu',
                 )
             else:
                 print(
@@ -199,7 +199,7 @@ def train_cbm_zero(args):
                 )
                 clip_image_features_train, clip_image_features_val = (
                     get_clip_image_features(
-                        args.device, args.clip_model_name, args.data_name
+                        'cpu', args.clip_model_name, args.data_name
                     )
                 )
                 torch.save(clip_image_features_train, clip_image_embeddings_train_path)
@@ -224,6 +224,8 @@ def train_cbm_zero(args):
             cx_val = (cx_val - cx_train_mean) / cx_train_std
             torch.save(cx_train, cx_train_path)
             torch.save(cx_val, cx_val_path)
+            cx_train = cx_train.to(args.device)
+            cx_val = cx_val.to(args.device)
 
     # load black-box's hidden space embeddings and last FCN layer
     if os.path.exists(bb_features_train_path) and os.path.exists(bb_features_val_path):
@@ -245,10 +247,17 @@ def train_cbm_zero(args):
             )
         )
         if args.black_box_model_name.startswith("clip_lp_"):
-            bb_features_train, bb_features_val = (
-                clip_image_features_train,
-                clip_image_features_val,
-            )
+            bb_features_train = torch.load(
+                    clip_image_embeddings_train_path,
+                    weights_only=True,
+                    map_location=args.device,
+                ).float()
+            
+            bb_features_val = torch.load(
+                    clip_image_embeddings_val_path,
+                    weights_only=True,
+                    map_location=args.device,
+                ).float()
         elif args.black_box_model_name.startswith("clip_mlp_"):
             bb_features_train, bb_features_val = get_clip_mlp_features(
                 args.device,
@@ -277,9 +286,25 @@ def train_cbm_zero(args):
             bb_last_fcn_b_path, map_location=args.device, weights_only=True
         )
     else:
-        proj_activation2class, proj_activation2class_bias = get_clip_mlp_fcn(
-            args.black_box_model_name, args.device
-        )
+        if args.black_box_model_name.startswith("clip_mlp_"):
+            proj_activation2class, proj_activation2class_bias = get_clip_mlp_fcn(
+                args.black_box_model_name, args.device
+            )
+
+        elif args.black_box_model_name.startswith("clip_lp_"):
+            proj_activation2class, proj_activation2class_bias = get_clip_lp_fcn(
+                args.black_box_model_name, args.device
+            ) 
+        else:
+            
+            print(
+                "Unknown black-box model: {}, please save last FCN layer on your own".format(
+                    args.black_box_model_name
+                )
+            )
+            raise ValueError(
+                "Unknown black-box model: {}".format(args.black_box_model_name)
+            )
         torch.save(proj_activation2class, bb_last_fcn_w_path)
         torch.save(proj_activation2class_bias, bb_last_fcn_b_path)
     # check the accuracy of the black-box model
@@ -446,7 +471,4 @@ def train_cbm_zero(args):
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    args.data_name = "cub"
-    args.concept_set_source = "cub_annotations"
-    args.black_box_model_name = "clip_mlp_ViT-L_14-h256_cub"
     train_cbm_zero(args)
