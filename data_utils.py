@@ -123,3 +123,42 @@ def load_labels(data_name):
         labels_train = data_train.targets
         labels_val = data_val.targets
     return labels_train, labels_val
+
+
+import pandas as pd
+def process_cub_annotations(concept_bank):
+    attributes = pd.read_csv(
+                data_path_cub + "attributes.txt",
+                sep=" ",
+                header=None,
+                names=["attribute_id", "attribute"],
+            )
+    for i, row in attributes.iterrows():
+        a = row["attribute"]
+        attributes.loc[i, "attribute"] = " ".join(
+            a.split("::")[0].split("_")[1:] + ["is"] + a.split("::")[1].split("_")
+        )
+    image_ids = pd.read_csv(
+                data_path_cub + "/attributes/images.txt",
+                sep=" ",
+                header=None,
+                names=["image_id", "image_name"],
+            )
+    image_attr = pd.read_csv(
+                data_path_cub+"/attributes/image_attribute_labels_clean.txt",
+                sep=" ",
+                header=None,
+                names=["image_id", "attribute_id", "is_present", "certainty_id", "time"],
+            )
+    image_attr = image_attr.merge(image_ids, on="image_id")
+    image_attr = image_attr.drop(columns=["time"])
+    image_attr["certainty"] = image_attr["certainty_id"].map(
+        {1: "not visible", 2: "guessing", 3: "probably", 4: "definitely"}
+    )
+    image_attr = image_attr.merge(attributes, on="attribute_id", how="left") 
+    annotations_local_pivot = image_attr.pivot(
+                index="image_name", columns="attribute", values="is_present"
+            )
+    # reorder the columns to match the order of the concepts
+    annotations_local_pivot = annotations_local_pivot[concept_bank]
+    return annotations_local_pivot
