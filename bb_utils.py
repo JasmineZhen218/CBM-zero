@@ -44,6 +44,27 @@ def load_clip_mlp_model(model_name):
     model = MLP(d1 = 768, d2=hidden_dim, K=K)
     return model
 
+
+def load_clip_lp_model(model_name):
+    if model_name.split('_')[-1] == 'cifar10':
+        K =10
+    elif '_cifar100' in model_name:
+        K = 100
+    elif '_cub' in model_name:
+        K = 200
+    elif '_imagenet' in model_name:
+        K = 1000
+    elif '_mnist' in model_name:
+        K = 10
+    elif 'food101' in model_name:
+        K = 101
+    elif 'awa2' in model_name:
+        K = 50
+    else:
+        raise ValueError("Dataset not supported")
+    model = nn.Linear(768, K)
+    return model
+
 def get_clip_mlp_fcn(black_box_model_name, device):
     assert black_box_model_name.startswith("clip_mlp_")
     bb_model = load_clip_mlp_model(black_box_model_name)
@@ -60,6 +81,25 @@ def get_clip_mlp_fcn(black_box_model_name, device):
     else:
         raise ValueError("black-box model does not exist: {}".format(black_box_model_name))
     return proj_activation2class, proj_activation2class_bias
+
+
+def get_clip_lp_fcn(black_box_model_name, device):
+    assert black_box_model_name.startswith("clip_lp_")
+    bb_model = load_clip_lp_model(black_box_model_name)
+    if os.path.exists("saved_bb_models/{}.pt".format(black_box_model_name)):
+        state_dict = torch.load(
+                    "saved_bb_models/{}.pt".format(black_box_model_name),
+                    map_location=device,
+                    weights_only=True,
+                )
+        bb_model.load_state_dict(state_dict)
+        bb_model.to(device)
+        proj_activation2class = bb_model.weight
+        proj_activation2class_bias = bb_model.bias
+    else:
+        raise ValueError("black-box model does not exist: {}".format(black_box_model_name))
+    return proj_activation2class, proj_activation2class_bias
+
 
 def get_clip_mlp_features(device, black_box_model_name, clip_image_embeddings_train_path, clip_image_embeddings_val_path):
     assert black_box_model_name.startswith("clip_mlp_")
