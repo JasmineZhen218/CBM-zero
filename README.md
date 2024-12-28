@@ -72,5 +72,5 @@ Please check the concept names in `/asset/concept_bank`. If you want to use your
 * -- `alpha` the trade-off between L1 and L2 regularization, default = 0.5
 * -- `n_iter` the number of iteration, default = 5000
 * -- `lr` initial learning rate, default = 0.1
-* -- `pc_threshold` threshold to filter out undetecable concept, default is 0.8 for cifar10, cifar100, imagenet, and food101; 0 for cub and awa2 (as they are given concepts with annotations)
+* -- `pc_threshold` threshold to filter out undetecable concept, default is 0 (no filtering).
 * -- `clip_model_name` clip model name, default is 'ViT-L_14'. Other choices: 'ViT-B_32',  'ViT-B_16',  'RN50', 'RN100' 
