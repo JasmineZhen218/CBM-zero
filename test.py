@@ -3,9 +3,10 @@ import argparse
 import numpy as np
 import pandas as pd
 from scipy.stats import pearsonr
+
 # customized functions
 from Utils.utils import set_seed, remove_duplicates
-from Utils.data_utils import load_labels
+from Utils.data_utils import load_labels, process_cub_annotations, get_data
 from Utils.evaluation_utils import calculate_x_factuality
 
 
@@ -32,7 +33,7 @@ parser.add_argument(
 parser.add_argument(
     "--pc_threshold",
     type=float,
-    default=0.8,
+    default=0,
     help="pearson correlation threshold for filtering concepts",
 )
 parser.add_argument(
@@ -74,19 +75,34 @@ def test_cbm_zero(args):
     concept_bank = [i for i in concept_bank if i not in classes]
     concept_bank = remove_duplicates(concept_bank)
     # load cx
-    print("Load clip similarities")
-    cx_val = torch.load(cx_val_path, map_location=args.device, weights_only=True)
+    print("Load concept features")
+    if args.data_name == "cub":
+        annotations_local_pivot = process_cub_annotations(concept_bank)
+        data_val = get_data(
+            "{}_val".format("cub"),
+            None,
+        )
+        image_ids_val = [
+            "/".join(image_id.split("/")[-2:]) for image_id, _ in data_val.imgs
+        ]
+        cx_val = (
+            torch.tensor(annotations_local_pivot.loc[image_ids_val].values)
+            .float()
+            .to(args.device)
+        )
+    else:
+        cx_val = torch.load(cx_val_path, map_location=args.device, weights_only=True)
     # load black-box's hidden space embeddings and last FCN layer
     print("Load black-box model's hidden features")
     bb_features_val = torch.load(
-            bb_features_val_path, map_location=args.device, weights_only=True
-        )
+        bb_features_val_path, map_location=args.device, weights_only=True
+    )
     proj_activation2class = torch.load(
-            bb_last_fcn_w_path, map_location=args.device, weights_only=True
-        )
+        bb_last_fcn_w_path, map_location=args.device, weights_only=True
+    )
     proj_activation2class_bias = torch.load(
-            bb_last_fcn_b_path, map_location=args.device, weights_only=True
-        )
+        bb_last_fcn_b_path, map_location=args.device, weights_only=True
+    )
     # check the accuracy of the black-box model
     print("Check the accuracy of the black-box model")
     logits_val = (
@@ -122,7 +138,7 @@ def test_cbm_zero(args):
         - proj_activation2class
         @ torch.linalg.pinv(proj_activation2concept)
         @ proj_activation2concept_bias
-    ) #new bias: b-AW^+h
+    )  # new bias: b-AW^+h
 
     # check the accuracy of CBM
     concept_bottleneck = (
@@ -150,7 +166,9 @@ def test_cbm_zero(args):
     print("Concept alignment: {:.4f}".format(pearson_corr.mean().item()))
     # sparsity
     threshold = 0.01
-    sparsity = torch.sum(torch.abs(proj_concept2class) < threshold).item() / (proj_concept2class.shape[0] * proj_concept2class.shape[1])
+    sparsity = torch.sum(torch.abs(proj_concept2class) < threshold).item() / (
+        proj_concept2class.shape[0] * proj_concept2class.shape[1]
+    )
     print("Concept sparsity (ratio of zero weights): {:.4f}".format(sparsity))
 
     # x-factuality@10
@@ -166,9 +184,100 @@ def test_cbm_zero(args):
         feature_importance,
         top_k=10,
     )
-    print(
-        f"Gloabl explanation quality: X-factuality@10 = {mean:.3f} ± {std:.3f}"
-    )
+    print(f"Gloabl explanation quality: X-factuality@10 = {mean:.3f} ± {std:.3f}")
+
+    # local explanation (only for cub)
+    if args.data_name == "cub":
+        print("Quantitatively evaluate the local explanation quality for CUB")
+        outs_val = (
+            torch.matmul(bb_features_val, proj_activation2concept.T)
+            + proj_activation2concept_bias
+        )
+        local_explanation_gd = pd.read_csv("data/CUB/cub_ground_truth.csv")
+        N_val = len(data_val)
+        local_evaluation_present = {
+            ("guessing", 0): [0] * N_val,
+            ("guessing", 1): [0] * N_val,
+            ("probably", 0): [0] * N_val,
+            ("probably", 1): [0] * N_val,
+            ("definitely", 0): [0] * N_val,
+            ("definitely", 1): [0] * N_val,
+            ("not visible", 0): [0] * N_val,
+        }
+        local_evaluation_absent = {
+            ("guessing", 0): [0] * N_val,
+            ("guessing", 1): [0] * N_val,
+            ("probably", 0): [0] * N_val,
+            ("probably", 1): [0] * N_val,
+            ("definitely", 0): [0] * N_val,
+            ("definitely", 1): [0] * N_val,
+            ("not visible", 0): [0] * N_val,
+        }
+        for top_k in [10]:
+            from tqdm import tqdm
+            for index in tqdm(range(N_val)):
+                image_id, label = data_val.imgs[index]
+                image_id = "/".join(image_id.split("/")[-2:])
+                predicted_label = predictions_val[index]
+                proj_concept2class_n = proj_concept2class[
+                    predicted_label
+                ] - proj_concept2class.mean(dim=0)
+                concept_contributions_n = proj_concept2class_n * outs_val[index]
+                # top k concepts
+                top_k_indices = torch.argsort(concept_contributions_n, descending=True)[
+                    :top_k
+                ]
+                # activation mask
+                activation_mask = outs_val[index, top_k_indices] > 0
+                # important by presence
+                concepts_present = [
+                    concept_bank[i] for i in top_k_indices[activation_mask]
+                ]
+                summary = (
+                    local_explanation_gd.loc[
+                        (local_explanation_gd["image_name"] == image_id)
+                        & (local_explanation_gd["attribute"].isin(concepts_present))
+                    ][["certainty", "is_present"]]
+                    .value_counts()
+                    .to_frame()
+                )
+                for i, row in summary.iterrows():
+                    local_evaluation_present[i][index] = row["count"] / len(
+                        concepts_present
+                    )
+
+                # important by absence
+                concepts_absent = [
+                    concept_bank[i] for i in top_k_indices[~activation_mask]
+                ]
+                summary = (
+                    local_explanation_gd.loc[
+                        (local_explanation_gd["image_name"] == image_id)
+                        & (local_explanation_gd["attribute"].isin(concepts_absent))
+                    ][["certainty", "is_present"]]
+                    .value_counts()
+                    .to_frame()
+                )
+                for i, row in summary.iterrows():
+                    local_evaluation_absent[i][index] = row["count"] / len(
+                        concepts_absent
+                    )
+
+            print("Local explantion: Important as the presence:")
+            for key, value in local_evaluation_present.items():
+                print(
+                    "{} - {:.4f} (mean), {:.4f} (std)".format(
+                        key, value.mean(), value.std()
+                    )
+                )
+            print("Local explantion: Important as the absence:")
+            for key, value in local_evaluation_absent.items():
+                print(
+                    "{} - {:.4f} (mean), {:.4f} (std)".format(
+                        key, value.mean(), value.std()
+                    )
+                )
+
 
 if __name__ == "__main__":
     args = parser.parse_args()
