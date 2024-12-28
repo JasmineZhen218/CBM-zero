@@ -3,14 +3,17 @@ import argparse
 import numpy as np
 import pandas as pd
 import random
+
 # customized functions
 from Utils.utils import set_seed, remove_duplicates
-from Utils.data_utils import load_labels, get_data
+from Utils.data_utils import load_labels, get_data, process_cub_annotations
 from Utils.visualization_utils import draw_local_explanations
 
 parser = argparse.ArgumentParser(description="Settings for creating CBM")
 parser.add_argument("--data_name", type=str, default="cifar10", help="data name")
-parser.add_argument("--class_name", type=str, default=None, help="class name to visualize")
+parser.add_argument(
+    "--class_name", type=str, default=None, help="class name to visualize"
+)
 parser.add_argument(
     "--concept_set_source",
     type=str,
@@ -32,7 +35,7 @@ parser.add_argument(
 parser.add_argument(
     "--pc_threshold",
     type=float,
-    default=0.8,
+    default=0,
     help="pearson correlation threshold for filtering concepts",
 )
 parser.add_argument(
@@ -61,7 +64,6 @@ def local_explanations(args):
     bb_features_val_path = f"saved_bb_features/Data[{args.data_name}]_Model[{args.black_box_model_name}]_val.pt"
     bb_last_fcn_w_path = f"saved_bb_last_FCN/{args.black_box_model_name}_w.pt"
     bb_last_fcn_b_path = f"saved_bb_last_FCN/{args.black_box_model_name}_b.pt"
-    cx_val_path = f"saved_cx/Data[{args.data_name}]_Model[{args.clip_model_name}]_Concept[{args.concept_set_source}]_Power[{args.power}]_val.pt"
     # load class names
     print("Load class names")
     with open("asset/class_names/{}.txt".format(args.data_name)) as f:
@@ -73,9 +75,7 @@ def local_explanations(args):
     concept_bank = [c for c in concept_bank if c not in ["", " "]]
     concept_bank = [i for i in concept_bank if i not in classes]
     concept_bank = remove_duplicates(concept_bank)
-    # load cx
-    print("Load clip similarities")
-    cx_val = torch.load(cx_val_path, map_location=args.device, weights_only=True)
+    
     # load black-box's hidden space embeddings and last FCN layer
     print("Load black-box model's hidden features")
     bb_features_val = torch.load(
@@ -104,7 +104,6 @@ def local_explanations(args):
     )
     concept_bank = [concept_bank[i] for i in c_indices]
     ground_truth = ground_truth.loc[ground_truth["concept"].isin(concept_bank)]
-    cx_val = cx_val[:, c_indices]
 
     # load saved model
     best_model = torch.load(projection_path, args.device)
@@ -148,10 +147,13 @@ def local_explanations(args):
         .detach()
         .cpu()
     )
-    proj_concept2class_n = (proj_concept2class[predicted_label] - proj_concept2class.mean(dim=0)).detach().cpu()
+    proj_concept2class_n = (
+        (proj_concept2class[predicted_label] - proj_concept2class.mean(dim=0))
+        .detach()
+        .cpu()
+    )
     concept_activation = outs_val[image_id].cpu()
     concept_contributions_n = proj_concept2class_n * concept_activation
-    
 
     draw_local_explanations(
         args.data_name,
@@ -166,6 +168,7 @@ def local_explanations(args):
         concept_activation,
         max_display=10,
     )
+
 
 
 if __name__ == "__main__":
