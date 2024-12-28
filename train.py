@@ -42,7 +42,7 @@ parser.add_argument(
 parser.add_argument(
     "--pc_threshold",
     type=float,
-    default=0.8,
+    default=0,
     help="pearson correlation threshold for filtering concepts",
 )
 parser.add_argument(
