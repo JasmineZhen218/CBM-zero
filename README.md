@@ -50,6 +50,6 @@ Please check the concept names in `/asset/concept_bank`. If you want to use your
 **Tunable hyperparameters**
 * -- `power` the power of exponential transformation controlling how much you want to emphasize on high clip scores, default = 5
 * -- `lambd` the regularization strength, default = 2.0
-* -- `alpha` the trade-off between L1 and L2 regularization, default = 0.99
+* -- `alpha` the trade-off between L1 and L2 regularization, default = 0.5
 * -- `n_iter` the number of iteration, default = 1000
 * -- `lr` initial learning rate, default = 0.1
